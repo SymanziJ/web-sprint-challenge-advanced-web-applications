@@ -24,10 +24,13 @@ export default function App() {
 
   const logout = () => {
     // ✨ implement
-    // If a token is in local storage it should be removed,
-    // and a message saying "Goodbye!" should be set in its proper state.
-    // In any case, we should redirect the browser back to the login screen,
+    // ✔️If a token is in local storage it should be removed,
+    window.localStorage.removeItem('token')
+    // ✔️and a message saying "Goodbye!" should be set in its proper state.
+    setMessage('GoodBye!');
+    // ✔️In any case, we should redirect the browser back to the login screen,
     // using the helper above.
+    redirectToLogin();
   }
 
   const login = ({ username, password }) => {
