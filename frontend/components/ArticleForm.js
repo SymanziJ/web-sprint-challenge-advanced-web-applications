@@ -6,13 +6,8 @@ const initialFormValues = { title: '', text: '', topic: '' }
 export default function ArticleForm(props) {
   const [values, setValues] = useState(initialFormValues)
   const { postArticle, updateArticle, currentArticle, setCurrentArticleId } = props;
-  // ✨ where are my props? Destructure them here
 
   useEffect(() => {
-    // ✨ implement
-    // ✔️Every time the `currentArticle` prop changes, we should check it for truthiness:
-    // ✔️if it's truthy, we should set its title, text and topic into the corresponding
-    // values of the form. ✔️If it's not, we should reset the form back to initial values.
     setValues( currentArticle || initialFormValues)
   },[currentArticle])
 
@@ -30,16 +25,11 @@ export default function ArticleForm(props) {
 
   const onSubmit = evt => {
     evt.preventDefault()
-    // ✨ implement
     !currentArticle ? postArticle(values) : updateArticle(values)
-    // We must submit a new post or update an existing one,
-    // depending on the truthyness of the `currentArticle` prop.
     setValues(initialFormValues);
   }
 
   const isDisabled = () => {
-    // ✨ implement
-    // Make sure the inputs have some values
     if (
       values.title.trim().length >= 1
       && values.text.trim().length >= 1
@@ -52,8 +42,6 @@ export default function ArticleForm(props) {
   }
 
   return (
-    // ✨ fix the JSX: make the heading display either "Edit" or "Create"
-    // and replace Function.prototype with the correct function
     <form id="form" onSubmit={onSubmit}>
       <h2>{!currentArticle ? 'Create' : 'Edit'} Article</h2>
       <input
@@ -78,7 +66,9 @@ export default function ArticleForm(props) {
       </select>
       <div className="button-group">
         <button disabled={isDisabled()} id="submitArticle">Submit</button>
-        <button onClick={reset}>Cancel edit</button>
+        {
+          currentArticle && <button onClick={reset}>Cancel edit</button>
+        }
       </div>
     </form>
   )
