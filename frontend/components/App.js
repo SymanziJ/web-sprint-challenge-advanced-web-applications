@@ -86,6 +86,19 @@ export default function App() {
   const postArticle = article => {
     // ✨ implement
     // The flow is very similar to the `getArticles` function.
+    setMessage('');
+    setSpinnerOn(true);
+    axiosWithAuth().post(articlesUrl, article)
+      .then(res => {
+        setArticles(articles.concat(res.data.article))
+      })
+      .catch(err => {
+        setMessage(err.response.data.message);
+        if (err.response.status === 401) {
+          redirectToLogin();
+        }
+      })
+      .finally(() => setSpinnerOn(false))
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
   }
@@ -115,7 +128,7 @@ export default function App() {
           <Route path="/" element={<LoginForm login={login}/>} />
           <Route path="articles" element={
             <>
-              <ArticleForm />
+              <ArticleForm postArticle={postArticle}/>
               <Articles getArticles={getArticles} articles={articles}/>
             </>
           } />
