@@ -90,6 +90,7 @@ export default function App() {
     setSpinnerOn(true);
     axiosWithAuth().post(articlesUrl, article)
       .then(res => {
+        setMessage(res.data.message);
         setArticles(articles.concat(res.data.article))
       })
       .catch(err => {
@@ -103,9 +104,27 @@ export default function App() {
     // to inspect the response from the server.
   }
 
-  const updateArticle = ({ article_id, article }) => {
+  const updateArticle = ( article ) => {
     // ✨ implement
     // You got this!
+    const { article_id, ...values } = article;
+    setMessage('');
+    setSpinnerOn(true);
+    axiosWithAuth().put(`${articlesUrl}/${article_id}`, values)
+      .then(res => {
+        setMessage(res.data.message);
+        setArticles(articles.map(article => {
+          return article.article_id === article_id ? res.data.article : article;
+        }));
+        setCurrentArticleId();
+      })
+      .catch(err => {
+        setMessage(err.response.data.message);
+        if (err.response.status === 401) {
+          redirectToLogin();
+        }
+      })
+      .finally(() => setSpinnerOn(false))
   }
 
   const deleteArticle = article_id => {
@@ -128,8 +147,17 @@ export default function App() {
           <Route path="/" element={<LoginForm login={login}/>} />
           <Route path="articles" element={
             <>
-              <ArticleForm postArticle={postArticle}/>
-              <Articles getArticles={getArticles} articles={articles}/>
+              <ArticleForm 
+                postArticle={postArticle}
+                updateArticle={updateArticle}
+                currentArticle={articles.find(art => art.article_id === currentArticleId)}
+                setCurrentArticleId={setCurrentArticleId}
+              />
+              <Articles 
+                getArticles={getArticles} 
+                articles={articles}
+                setCurrentArticleId={setCurrentArticleId}
+              />
             </>
           } />
         </Routes>
