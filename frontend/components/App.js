@@ -6,6 +6,7 @@ import LoginForm from './LoginForm'
 import Message from './Message'
 import ArticleForm from './ArticleForm'
 import Spinner from './Spinner'
+import axiosWithAuth from '../axios';
 
 const articlesUrl = 'http://localhost:9000/api/articles'
 const loginUrl = 'http://localhost:9000/api/login'
@@ -57,14 +58,29 @@ export default function App() {
   }
 
   const getArticles = () => {
-    // ✨ implement
-    // We should flush the message state, turn on the spinner
-    // and launch an authenticated request to the proper endpoint.
-    // On success, we should set the articles in their proper state and
-    // put the server success message in its proper state.
-    // If something goes wrong, check the status of the response:
-    // if it's a 401 the token might have gone bad, and we should redirect to login.
-    // Don't forget to turn off the spinner!
+    //reset message state
+    setMessage('');
+    // turn on spinner
+    setSpinnerOn(true);
+    // ✔️We should flush the message state, turn on the spinner
+    // ✔️and launch an authenticated request to the proper endpoint.
+    axiosWithAuth().get(articlesUrl)
+      .then(res => {
+        setArticles(res.data.articles);
+        setMessage(res.data.message);
+      })
+      .catch(err => {
+        setMessage(err.response.data.message);
+        if (err.response.status === 401) {
+          redirectToLogin();
+        }
+      })
+      .finally(() => setSpinnerOn(false))
+    // ✔️On success, we should set the articles in their proper state and
+    // ✔️put the server success message in its proper state.
+    // ✔️If something goes wrong, check the status of the response:
+    // ✔️if it's a 401 the token might have gone bad, and ✔️we should redirect to login.
+    // ✔️Don't forget to turn off the spinner!
   }
 
   const postArticle = article => {
@@ -86,7 +102,7 @@ export default function App() {
   return (
     // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <>
-      <Spinner spinnerOn={spinnerOn}/>
+      <Spinner on={spinnerOn}/>
       <Message message={message}/>
       <button id="logout" onClick={logout}>Logout from app</button>
       <div id="wrapper" style={{ opacity: spinnerOn ? "0.25" : "1" }}> {/* <-- do not change this line */}
@@ -100,7 +116,7 @@ export default function App() {
           <Route path="articles" element={
             <>
               <ArticleForm />
-              <Articles />
+              <Articles getArticles={getArticles} articles={articles}/>
             </>
           } />
         </Routes>
