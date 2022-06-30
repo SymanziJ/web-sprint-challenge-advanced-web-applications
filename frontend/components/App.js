@@ -92,6 +92,7 @@ export default function App() {
       .then(res => {
         setMessage(res.data.message);
         setArticles(articles.concat(res.data.article))
+        setCurrentArticleId();
       })
       .catch(err => {
         setMessage(err.response.data.message);
@@ -113,8 +114,8 @@ export default function App() {
     axiosWithAuth().put(`${articlesUrl}/${article_id}`, values)
       .then(res => {
         setMessage(res.data.message);
-        setArticles(articles.map(article => {
-          return article.article_id === article_id ? res.data.article : article;
+        setArticles(articles.map(art => {
+          return art.article_id === article_id ? res.data.article : art;
         }));
         setCurrentArticleId();
       })
@@ -129,6 +130,20 @@ export default function App() {
 
   const deleteArticle = article_id => {
     // ✨ implement
+    setMessage('');
+    setSpinnerOn(true);
+    axiosWithAuth().delete(`${articlesUrl}/${article_id}`)
+      .then(res => {
+        setMessage(res.data.message);
+        setArticles(articles.filter(art => art.article_id !== article_id));
+      })
+      .catch(err => {
+        setMessage(err.response.data.message);
+        if (err.response.status === 401) {
+          redirectToLogin();
+        }
+      })
+      .finally(()=>setSpinnerOn(false))
   }
 
   return (
@@ -150,13 +165,15 @@ export default function App() {
               <ArticleForm 
                 postArticle={postArticle}
                 updateArticle={updateArticle}
-                currentArticle={articles.find(art => art.article_id === currentArticleId)}
                 setCurrentArticleId={setCurrentArticleId}
+                currentArticle={articles.find(art => art.article_id === currentArticleId)}
               />
               <Articles 
                 getArticles={getArticles} 
                 articles={articles}
+                currentArticleId={currentArticleId}
                 setCurrentArticleId={setCurrentArticleId}
+                deleteArticle={deleteArticle}
               />
             </>
           } />

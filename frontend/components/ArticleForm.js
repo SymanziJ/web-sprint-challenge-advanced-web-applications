@@ -21,12 +21,20 @@ export default function ArticleForm(props) {
     setValues({ ...values, [id]: value })
   }
 
+  
+  const reset = (evt) => {
+    evt.preventDefault()
+    setValues(initialFormValues);
+    setCurrentArticleId();
+  }
+
   const onSubmit = evt => {
     evt.preventDefault()
     // ✨ implement
     !currentArticle ? postArticle(values) : updateArticle(values)
     // We must submit a new post or update an existing one,
     // depending on the truthyness of the `currentArticle` prop.
+    setValues(initialFormValues);
   }
 
   const isDisabled = () => {
@@ -41,12 +49,6 @@ export default function ArticleForm(props) {
     } else {
       return true;
     }
-  }
-
-  const reset = (evt) => {
-    evt.preventDefault()
-    setValues(initialFormValues);
-    setCurrentArticleId();
   }
 
   return (
